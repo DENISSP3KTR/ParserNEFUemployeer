@@ -48,19 +48,19 @@ def main(univer_name):
     return staff
 
 
-print(main('imi'))
+#print(main('imi'))
 
 def push_in_excel():
     employees = main('imi')
     FIO = []
     position = []
+    training = []
     for employee, employee_info in employees.items():
         FIO.append(employee)
         position.append(employee_info.get('Должность:'))
+        training.append(employee_info.get('Повышение квалификации:'))
 
+    
 
-    for i in position:
-        print(i)
-
-
-push_in_excel()            
+    print(training[1].split("/r"))
+push_in_excel()
