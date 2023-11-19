@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+#import pandas as pd
 
 # Возвращает ссылки сотрудников
 def get_staff_links(univer_name):
@@ -45,5 +46,19 @@ def main(univer_name):
     return staff
 
 
-print(main('imi'))
+#print(main('imi'))
 
+def push_in_excel():
+    employees = main('imi')
+    FIO = []
+    position = []
+    for employee, employee_info in employees.items():
+        FIO.append(employee)
+        position.append(employee_info.get('Должность'))
+
+
+    for i in position:
+        print(i)
+
+
+push_in_excel()            
