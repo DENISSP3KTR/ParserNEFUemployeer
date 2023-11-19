@@ -19,10 +19,12 @@ def get_staff_links(univer_name):
     return links
 
 
+
 def main(univer_name):
     staff = dict()
+    asd = ['/staff/724792', '/staff/722703']
     # цикл элементов из списка ссылок на сотрудников
-    for link in get_staff_links(univer_name):
+    for link in asd:
         url = 'https://www.s-vfu.ru'+link
         page = urlopen(url)
         html = page.read().decode('utf-8')
@@ -46,7 +48,7 @@ def main(univer_name):
     return staff
 
 
-#print(main('imi'))
+print(main('imi'))
 
 def push_in_excel():
     employees = main('imi')
@@ -54,7 +56,7 @@ def push_in_excel():
     position = []
     for employee, employee_info in employees.items():
         FIO.append(employee)
-        position.append(employee_info.get('Должность'))
+        position.append(employee_info.get('Должность:'))
 
 
     for i in position:
