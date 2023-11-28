@@ -1,3 +1,4 @@
+from gettext import find
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import pandas as pd
@@ -54,39 +55,52 @@ def push_in_excel():
     employees = main('imi')
     year_training = []
     year_konf = []
+    fio = []
+    position = []
+    training = []
+    konf = []
+    work_exp = []
+
     year = datetime.datetime.now().year
     for i in range(0, 5):
         year_training.append(str(year - i))
     for i in range(0, 3):
         year_konf.append(str(year - i))
-    FIO = []
-    position = []
-    training = []
-    klaf = []
-    work_exp = []
+    
+    
     for employee, employee_info in employees.items():
-        FIO.append(employee)
+        fio.append(employee)
         position.append(employee_info.get('Должность:')[0])
         training.append(employee_info.get('Повышение квалификации:'))
-        klaf.append(employee_info.get('Участие в конференциях, симпозиумах:'))
+        konf.append(employee_info.get('Участие в конференциях, симпозиумах:'))
         work_exp.append(employee_info.get('Стаж работы по специальности:'))
 
     # Поиск повышения квалификации за последние 5 лет
     for index1, empl in enumerate(training):
-        if empl:
-            for index2, train_info in enumerate(empl):
-                if not any(x in train_info for x in year_training):
-                    training[index1].pop(index2)
+        if not (empl is None):
+            i = 0
+            while i < len(training[index1]):
+                if not any(x in training[index1][i] for x in year_training):
+                    training[index1].pop(i)
+                else:
+                    i += 1    
 
-                    # Поиск участие в конференциях, симпозиумах за последние 3 года
 
-    for index1, empl in enumerate(klaf):
-        if empl:
-            for index2, klaf_info in enumerate(empl):
-                if not any(x in klaf_info for x in year_konf):
-                    klaf[index1].pop(index2)
+    # Поиск участие в конференциях, симпозиумах за последние 3 года             
+    for index1, empl in enumerate(konf):
+        if not (empl is None):
+            i = 0
+            while i < len(konf[index1]):      
+                if not any(x in konf[index1][i] for x in year_konf):
+                    konf[index1].pop(i)
+                else:
+                    i += 1    
 
-    print(klaf[0])
+    print(training)
 
+    # for konf_info in konf[0]:
+    #     print(konf_info)         
+        
+    
 
 push_in_excel()
