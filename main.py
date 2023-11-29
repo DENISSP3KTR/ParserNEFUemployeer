@@ -56,9 +56,11 @@ def push_in_excel():
     year_training = []
     year_konf = []
     fio = []
-    position = []
+    position = []  
     training = []
+    training_in_string = []
     konf = []
+    konf_in_string = []
     work_exp = []
 
     year = datetime.datetime.now().year
@@ -96,11 +98,25 @@ def push_in_excel():
                 else:
                     i += 1    
 
-    print(training)
+    #print(employees)
 
-    # for konf_info in konf[0]:
-    #     print(konf_info)         
-        
+    for i in training:
+        if not (i is None):
+            training_in_string.append(' '.join(i))
+    for i in konf:
+        if not (i is None):
+            konf_in_string.append(' '.join(i))
+
+    if len(training_in_string) > len(konf_in_string):
+        for i in range(0, (len(training_in_string) - len(konf_in_string))):
+            konf_in_string.append('')
+    if len(training_in_string) < len(konf_in_string):
+        for i in range(0, (len(konf_in_string) - len(training_in_string))):
+            training_in_string.append('')
+
+    print(training_in_string)
+    df = pd.DataFrame({'ФИО' : fio, 'Должность' : position, 'Повышение квалификации' : training_in_string, 'Участие в конференциях, симпозиумах' : konf_in_string, 'Стаж работы по специальности' : work_exp})
+    df.to_excel('./employees.xlsx',  sheet_name='Сотрудники', index=False)    
     
 
 push_in_excel()
