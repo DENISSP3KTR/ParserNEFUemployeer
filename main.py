@@ -72,10 +72,11 @@ def push_in_excel():
     
     for employee, employee_info in employees.items():
         fio.append(employee)
-        position.append(employee_info.get('Должность:')[0])
-        training.append(employee_info.get('Повышение квалификации:'))
-        konf.append(employee_info.get('Участие в конференциях, симпозиумах:'))
-        work_exp.append(employee_info.get('Стаж работы по специальности:'))
+        position.append(employee_info.get('Должность:', [' '])[0])
+        training.append(employee_info.get('Повышение квалификации:', ['']))
+        konf.append(employee_info.get('Участие в конференциях, симпозиумах:', ['']))
+        work_exp.append(employee_info.get('Стаж работы по специальности:', [' '])[0])
+
 
     # Поиск повышения квалификации за последние 5 лет
     for index1, empl in enumerate(training):
@@ -114,9 +115,8 @@ def push_in_excel():
         for i in range(0, (len(konf_in_string) - len(training_in_string))):
             training_in_string.append('')
 
-    # print(training_in_string)
+    #print(employees)
     df = pd.DataFrame({'ФИО': fio, 'Должность': position, 'Повышение квалификации': training_in_string, 'Участие в конференциях, симпозиумах': konf_in_string, 'Стаж работы по специальности': work_exp})
     df.to_excel('./employees.xlsx',  sheet_name='Сотрудники', index=False)    
     
-
 push_in_excel()
