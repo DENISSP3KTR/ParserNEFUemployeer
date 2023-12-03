@@ -24,11 +24,11 @@ def get_staff_links(univer_name):
 
 def main(univer_name):
     staff = dict()
-    asd = ['/staff/724792', '/staff/722703']
+    asd = ['/staff/724792', '/staff/895039920']
     staff_category = ['Должность:', 'Повышение квалификации:', 'Участие в конференциях, симпозиумах:',
                       'Стаж работы по специальности:']
     # цикл элементов из списка ссылок на сотрудников
-    for link in asd:
+    for link in asd:  #get_staff_links(univer_name):
         url = 'https://www.s-vfu.ru' + link
         page = urlopen(url)
         html = page.read().decode('utf-8')
@@ -114,8 +114,8 @@ def push_in_excel():
         for i in range(0, (len(konf_in_string) - len(training_in_string))):
             training_in_string.append('')
 
-    print(training_in_string)
-    df = pd.DataFrame({'ФИО' : fio, 'Должность' : position, 'Повышение квалификации' : training_in_string, 'Участие в конференциях, симпозиумах' : konf_in_string, 'Стаж работы по специальности' : work_exp})
+    # print(training_in_string)
+    df = pd.DataFrame({'ФИО': fio, 'Должность': position, 'Повышение квалификации': training_in_string, 'Участие в конференциях, симпозиумах': konf_in_string, 'Стаж работы по специальности': work_exp})
     df.to_excel('./employees.xlsx',  sheet_name='Сотрудники', index=False)    
     
 
