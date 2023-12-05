@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import pandas as pd
 import datetime
-
+import concurrent.futures
 
 # Возвращает ссылки сотрудников
 def get_staff_links(univer_name):
@@ -22,32 +22,34 @@ def get_staff_links(univer_name):
     return links
 
 
+def parse_staff(url):
+    page = urlopen(url)
+    html = page.read().decode('utf-8')
+    soup = BeautifulSoup(html, 'html.parser')
+    staff_name = soup.find('h1').get_text()
+    staff_about = dict()
+    staff_category = ['Должность:', 'Повышение квалификации:', 'Участие в конференциях, симпозиумах:',
+                     'Стаж работы по специальности:']
+    for i in soup.find_all('h3', class_='h6 mb-0'):
+        if i.text.strip() in staff_category:
+            catt1 = i.find_next('div')
+            casd = [tag.get_text(strip=True) for tag in catt1 if tag.get_text(strip=True)]
+            staff_about[i.text.strip()] = casd
+
+    return staff_name, staff_about
+
+
 def main(univer_name):
     staff = dict()
-    asd = ['/staff/724792', '/staff/895039920']
-    staff_category = ['Должность:', 'Повышение квалификации:', 'Участие в конференциях, симпозиумах:',
-                      'Стаж работы по специальности:']
-    # цикл элементов из списка ссылок на сотрудников
-    for link in asd:  #get_staff_links(univer_name):
-        url = 'https://www.s-vfu.ru' + link
-        page = urlopen(url)
-        html = page.read().decode('utf-8')
-        soup = BeautifulSoup(html, 'html.parser')
 
-        # Получение имени сотрудника по тегу h1, так как он единственный
-        staff_name = soup.find('h1').get_text()
-        staff_about = dict()
-        for i in soup.find_all('h3', class_='h6 mb-0'):
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = [executor.submit(parse_staff, 'https://www.s-vfu.ru' + link) for link in get_staff_links(univer_name)]
 
-            if i.text.strip() in staff_category:
-                catt1 = i.find_next('div')
-                casd = [tag.get_text(strip=True) for tag in catt1 if tag.get_text(strip=True)]
-                staff_about[i.text.strip()] = casd
-        staff[staff_name] = staff_about
+        for future in concurrent.futures.as_completed(futures):
+            staff_name, staff_about = future.result()
+            staff[staff_name] = staff_about
 
     return staff
-
-
 # print(main('imi'))
 
 
