@@ -68,8 +68,8 @@ def push_in_excel():
     year = datetime.datetime.now().year
     for i in range(0, 5):
         year_training.append(str(year - i))
-    for i in range(0, 3):
-        year_konf.append(str(year - i))
+        if i <= 2:
+            year_konf.append(str(year - i))
     
     
     for employee, employee_info in employees.items():
