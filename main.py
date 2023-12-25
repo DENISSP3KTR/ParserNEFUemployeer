@@ -1,9 +1,9 @@
-from gettext import find
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import pandas as pd
 import datetime
 import concurrent.futures
+from openpyxl import Workbook
 
 # Возвращает ссылки сотрудников
 def get_staff_links(univer_name):
@@ -58,7 +58,7 @@ def push_in_excel():
     year_training = []
     year_konf = []
     fio = []
-    position = []  
+    position = []
     training = []
     training_in_string = []
     konf = []
@@ -70,15 +70,15 @@ def push_in_excel():
         year_training.append(str(year - i))
         if i <= 2:
             year_konf.append(str(year - i))
-    
-    
+
+
     for employee, employee_info in employees.items():
-        fio.append(employee)
+        name = employee.split()
+        fio.append(' '.join([name[-1]] + name[:-1]))
         position.append(employee_info.get('Должность:', [' '])[0])
         training.append(employee_info.get('Повышение квалификации:', ['']))
         konf.append(employee_info.get('Участие в конференциях, симпозиумах:', ['']))
         work_exp.append(employee_info.get('Стаж работы по специальности:', [' '])[0])
-
 
     # Поиск повышения квалификации за последние 5 лет
     for index1, empl in enumerate(training):
@@ -88,20 +88,19 @@ def push_in_excel():
                 if not any(x in training[index1][i] for x in year_training):
                     training[index1].pop(i)
                 else:
-                    i += 1    
+                    i += 1
 
 
-    # Поиск участие в конференциях, симпозиумах за последние 3 года             
+    # Поиск участие в конференциях, симпозиумах за последние 3 года
     for index1, empl in enumerate(konf):
         if not (empl is None):
             i = 0
-            while i < len(konf[index1]):      
+            while i < len(konf[index1]):
                 if not any(x in konf[index1][i] for x in year_konf):
                     konf[index1].pop(i)
                 else:
-                    i += 1    
+                    i += 1
 
-    #print(employees)
 
     for i in training:
         if not (i is None):
@@ -117,8 +116,30 @@ def push_in_excel():
         for i in range(0, (len(konf_in_string) - len(training_in_string))):
             training_in_string.append('')
 
-    #print(employees)
-    df = pd.DataFrame({'ФИО': fio, 'Должность': position, 'Повышение квалификации': training_in_string, 'Участие в конференциях, симпозиумах': konf_in_string, 'Стаж работы по специальности': work_exp})
-    df.to_excel('./employees.xlsx',  sheet_name='Сотрудники', index=False)    
-    
+    # df = pd.DataFrame({'ФИО': fio, 'Должность': position, 'Повышение квалификации': training_in_string, 'Участие в конференциях, симпозиумах': konf_in_string, 'Стаж работы по специальности': work_exp})
+    # df.to_excel('./employees.xlsx',  sheet_name='Сотрудники', index=False)
+    wb = Workbook()
+    ws = wb.active
+
+    # Заполните лист данными
+    ws.append(['ФИО', 'Должность', 'Повышение квалификации', 'Участие в конференциях, симпозиумах',
+               'Стаж работы по специальности'])
+    for f, p, t, k, w in zip(fio, position, training_in_string, konf_in_string, work_exp):
+        ws.append([f, p, t, k, w])
+
+    # Регулировка ширины столбцов
+    for column in ws.columns:
+        max_length = 0
+        column = [cell for cell in column]
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except:
+                pass
+        adjusted_width = (max_length + 2)
+        ws.column_dimensions[column[0].column_letter].width = adjusted_width
+
+    # Сохраните книгу Excel
+    wb.save('./employees.xlsx')
 push_in_excel()
